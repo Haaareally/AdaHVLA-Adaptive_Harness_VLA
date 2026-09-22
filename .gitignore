@@ -32,6 +32,7 @@ results/
 wandb/
 tensorboard/
 .DS_Store
+docs/assets/*.mp4
 
 # Required release media, including when nested in a checkout ignoring images.
 !assets/matterport/**/textures/*.jpg

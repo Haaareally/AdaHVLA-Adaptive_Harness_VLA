@@ -27,11 +27,11 @@ This release includes **Go2 simulation navigation**: the sample harness, adaptat
 
 ## Demos
 
-Excerpts from the submission video at its original playback speed. Click a preview for the full-resolution MP4.
+Excerpts from the submission video at its original playback speed.
 
 ### Real-world execution
 
-[![Real-world quadruped execution, with the robot view, task progress, and comparison panels.](docs/assets/demo-real-world.gif)](docs/assets/demo-real-world.mp4)
+![Real-world quadruped execution, with the robot view, task progress, and comparison panels.](docs/assets/demo-real-world.gif)
 
 *Multi-stage quadruped navigation, including the robot view and comparisons with Single VLA and harness revisions.*
 
@@ -39,7 +39,7 @@ Excerpts from the submission video at its original playback speed. Click a previ
 
 Three navigation tasks with Single VLA above AdaHVLA; manipulation comparisons at grasp, transfer, and release along the bottom.
 
-[![Simulation comparisons with all navigation camera views and the manipulation panels in their original layout.](docs/assets/demo-simulation.gif)](docs/assets/demo-simulation.mp4)
+![Simulation comparisons with all navigation camera views and the manipulation panels in their original layout.](docs/assets/demo-simulation.gif)
 
 ## Getting started
 
