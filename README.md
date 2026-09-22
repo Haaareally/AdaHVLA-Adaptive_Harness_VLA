@@ -4,95 +4,59 @@
 
 ### Adaptive Harnesses for Long-Horizon Vision-Language-Action Execution
 
-**Adaptive coordination for long-horizon robot tasks.**
-
 The preprint of our paper is coming soon.
 
-[Overview](#overview) · [Architecture](#architecture) · [Customizing the harness](#customizing-the-harness) · [Getting started](#getting-started) · [Running adaptation](#running-adaptation) · [Acknowledgments](#acknowledgments)
+[Overview](#overview) · [Demos](#demos) · [Getting started](#getting-started) · [Running adaptation](#running-adaptation) · [Customizing the harness](#customizing-the-harness) · [Acknowledgments](#acknowledgments)
 
 </div>
 
-AdaHVLA connects task-level reasoning and memory with vision-language-action (VLA) execution through an adaptive harness. Long-horizon tasks require a robot to remember what happened, track unfinished goals, and respond when execution departs from the plan. A locally appropriate action alone may not establish the conditions needed for the next stage: reaching a doorway, for example, is different from passing through it.
-
-Our central idea is to make these coordination decisions explicit and editable in code. The harness determines what instruction and visual history the VLA receives, when task progress is committed, and how recovery and completion are handled. Between rollouts, a multi-agent process turns robot experience into testable hypotheses and code revisions, then checks their effects in subsequent execution. A revision graph retains alternative harnesses and the evidence behind them, allowing successful and unsuccessful attempts to inform continued adaptation across tasks and environments.
-
-<p align="center">
-  <img src="docs/assets/figure1.png" width="560" alt="Paper Figure 1: AdaHVLA in simulated navigation and manipulation environments and on a real quadruped." />
-</p>
-<p align="center"><em>Figure 1. Deployments across tasks, environments, and robotic platforms studied in the paper.</em></p>
+AdaHVLA connects task-level reasoning and memory with vision-language-action (VLA) execution through an adaptive harness. The harness controls local instructions, visual context, task progress, recovery, and completion. Between rollouts, manager, analyst, engineer, and reviewer agents turn execution evidence into hypotheses and code revisions. A revision graph retains candidate harnesses and their observed effects to guide further adaptation.
 
 ## Overview
 
-This release provides the **Go2 quadruped navigation** implementation: the online harness, multi-agent adaptation loop, NaVILA service adapter, simulator configuration, and a 50-episode benchmark packaged as `navila-LH`.
+This release includes **Go2 simulation navigation**: the sample harness, adaptation loop, NaVILA adapter, locomotion controller, simulator assets, and the 50-episode `navila-LH` dataset. Manipulation and real-robot adapters are not included. For manipulation research, we recommend [π0.5](https://www.pi.website/blog/pi05) and [openpi](https://github.com/Physical-Intelligence/openpi).
 
-- **Persistent task context.** Recent observations, visual checkpoints, and compact memory support reasoning across execution stages.
-- **Editable coordination policies.** Python policies govern subgoal progress, local instructions, visual refresh, recovery, and completion.
-- **Evidence-driven adaptation.** Separate manager, analyst, engineer, and reviewer contexts connect observed failures to focused revisions and behavioral comparisons.
-- **Cumulative adaptation memory.** A revision graph links evidence, hypotheses, candidate code, and observed effects to guide later attempts.
+## Demos
 
-The navigation implementation uses [NaVILA](https://github.com/AnjieCheng/NaVILA) to produce navigation actions and a pretrained Go2 locomotion controller to execute them.
+Cropped excerpts from the submission video, with subtitles and episode labels removed. Click a preview to open its MP4 version.
 
-The paper explores adaptation across robot platforms. This code release currently includes the Go2 simulation path; manipulation and real-robot adapters are not included. For manipulation research, we strongly recommend [π0.5](https://www.pi.website/blog/pi05) and the [openpi implementation](https://github.com/Physical-Intelligence/openpi).
+### Real-world execution
 
-## Architecture
+[![AdaHVLA quadruped completing a multi-stage task in the real world.](docs/assets/demo-real-world.gif)](docs/assets/demo-real-world.mp4)
 
-![Paper Figure 2: execution harness, evidence-driven adaptation loop, and candidate revision graph.](docs/assets/figure2.png)
+*Multi-stage quadruped navigation; 2× the submission video's playback speed.*
 
-*Figure 2. During execution, coordination policies connect task reasoning and visual history to the VLA. During adaptation, rollout evidence informs hypotheses, source revisions, and comparisons recorded in a revision graph.*
+### Simulation
 
-### Online execution
+**Navigation — three tasks.** Single VLA on the top row; AdaHVLA on the bottom row. Cropped first-person views, at 1.5× playback speed.
 
-```text
-Task + visual observations
-          ↓
-Harness: context → subgoal progress → instruction and context handoff
-          ↓
-NaVILA → navigation action → Go2 locomotion controller
-          ↓
-Isaac Sim → updated observations → next harness decision
-```
+[![Three simulated navigation comparisons, with Single VLA above AdaHVLA.](docs/assets/demo-simulation-navigation.gif)](docs/assets/demo-simulation-navigation.mp4)
 
-The harness combines recent observations, visual checkpoints, a compact task memory, and execution feedback. A single reasoning interface proposes a plan and subsequent progress decisions. Explicit policies validate those decisions and control when to refresh the VLA's local history. Task-level memory survives a local history refresh. The VLA owns motion generation; the harness supplies objectives and can declare task completion.
+**Manipulation — grasp, transfer, and release.** Single VLA on the top row; AdaHVLA on the bottom row, at 1.5× playback speed.
 
-### Adaptation between rollouts
+[![Simulated manipulation comparison at grasp, transfer, and release stages.](docs/assets/demo-simulation-manipulation.gif)](docs/assets/demo-simulation-manipulation.mp4)
 
-```text
-Prototype rollout → analyze evidence → propose a harness revision
-       ↑                                      ↓
-Select / continue ← compare parent and child ← check, review, and evaluate
-       ↓
-Selected harness → held-out evaluation
-```
+<details>
+<summary>Paper figures: deployments and architecture</summary>
 
-The starting harness is saved as `C0000`. The engineer can edit `harness.py` in a candidate copy. Each proposed revision states a coordination hypothesis and its expected observable effect. Source checks and independent review determine whether a candidate can run; new rollouts test whether the mechanism actually changed behavior. Parent–child comparisons guide selection, while the revision graph retains the evidence for further adaptation. Candidate copies and hashes provide integrity checks, not an operating-system security sandbox.
+<p align="center">
+  <img src="docs/assets/figure1.png" width="480" alt="Paper Figure 1: AdaHVLA in simulated navigation and manipulation environments and on a real quadruped." />
+</p>
+<p align="center"><em>Figure 1. Tasks, environments, and robotic platforms studied in the paper.</em></p>
 
-| File | Responsibility |
-| --- | --- |
-| [`harness.py`](src/adahvla/harness.py) | Reasoning prompt, visual context, progress and handoff policies, online loop |
-| [`adaptation.py`](src/adahvla/adaptation.py) | Agent contexts, revision workflow, selection, budgets, and held-out phase |
-| [`workspace.py`](src/adahvla/workspace.py) | Candidate source, checks, subprocess evaluation, and evidence storage |
-| [`vla.py`](src/adahvla/vla.py) | NaVILA socket client and inference server |
-| [`locomotion.py`](src/adahvla/locomotion.py) | Controller loading, observations, and velocity-command execution |
-| [`configs/`](configs/) | Go2, sensors, simulation timing, and asset paths |
-| [`scripts/run.sh`](scripts/run.sh) | Prototype → adaptation → held-out evaluation entry point |
-| [`scripts/evaluate.py`](scripts/evaluate.py) | One candidate and one episode in a separate simulator process |
-| [`tests/`](tests/) | Offline software tests |
+![Paper Figure 2: execution harness, adaptation loop, and candidate revision graph.](docs/assets/figure2.png)
 
-## Customizing the harness
+*Figure 2. Harness execution and adaptation from rollout evidence.*
 
-**The included harness is a sample implementation and a starting point for your own robot tasks.** Its prompts, memory structure, progress rules, and recovery behavior illustrate the AdaHVLA approach. For a specific robot, task family, or environment, you should write or optimize these policies around the robot's capabilities, available observations, and observable task-completion criteria.
-
-Start with [`harness.py`](src/adahvla/harness.py): adapt `DECISION_PROMPT` to the task, `ContextPolicy` to the useful observation history, and `ProgressPolicy` and `HandoffPolicy` to stage transitions and execution guidance. When integrating another robot or VLA, also implement the corresponding executor and environment interfaces and define an appropriate evaluation metric. The supplied adapters and runner currently target Go2 navigation.
-
-Validate your starting harness on representative rollouts, then use the adaptation loop to investigate and refine its coordination behavior. Check each revision against its predicted effect and evaluate the selected harness on tasks reserved for testing.
+</details>
 
 ## Getting started
 
-Run the following commands from the **AdaHVLA project root**. Core harness and adaptation code use Python 3.10+ and the standard library. Full navigation runs additionally require the simulator, a NaVILA server, and a vision-capable reasoning API.
+Run commands from the **AdaHVLA project root**. Full execution requires two Python environments, an NVIDIA GPU, and a vision-capable reasoning API.
 
 ### 1. Check the source and assets
 
-For an offline check, no model service or GPU is needed:
+The offline check requires Python 3.10+; no GPU or API is needed:
 
 ```bash
 cd /path/to/AdaHVLA
@@ -100,23 +64,21 @@ python -m pip install -r requirements.txt
 bash scripts/run.sh --check
 ```
 
-This verifies asset hashes, episode selections, and the prototype interface without calling an API, starting Isaac Sim, or creating a persistent experiment.
-
-Expected resources:
+This checks asset hashes, episode selections, and the prototype interface without starting the simulator or creating an experiment. Bundled resources include:
 
 ```text
-benchmarks/navila-LH/dataset.json.gz   # 50 navigation episodes
-assets/locomotion/go2/policy.jit       # Go2 inference controller
+benchmarks/navila-LH/dataset.json.gz   # 50 episodes
+assets/locomotion/go2/policy.jit       # inference controller
 assets/robots/go2/                    # robot USD and meshes
-assets/matterport/<scene>/            # six scenes and their textures
-assets/manifest.json                  # asset provenance, sizes, and SHA-256 hashes
+assets/matterport/<scene>/            # six scenes with textures
+assets/manifest.json                  # provenance and SHA-256 hashes
 ```
 
-`navila-LH` is the benchmark name used in this release. The environment and asset setup builds on [NaVILA-Bench](https://github.com/yang-zj1026/NaVILA-Bench) and its [VLN-CE-Isaac data release](https://huggingface.co/datasets/Zhaojing/VLN-CE-Isaac). The run selections below are configurable examples, not an upstream benchmark protocol. Keep scene textures with their USD files when copying the project.
+Keep scene textures alongside their USD files. The assets and environment build on [NaVILA-Bench](https://github.com/yang-zj1026/NaVILA-Bench) and [VLN-CE-Isaac](https://huggingface.co/datasets/Zhaojing/VLN-CE-Isaac).
 
 ### 2. Install the simulation environment
 
-The simulation baseline follows [NaVILA-Bench's installation requirements](https://github.com/yang-zj1026/NaVILA-Bench#installation): **Linux, Python 3.10, Isaac Sim 4.1.0, and the NaVILA Isaac Lab 1.1.0 fork**, with a compatible NVIDIA GPU and driver. For the pip-based installation below, use Ubuntu 22.04 or later.
+The simulation baseline follows [NaVILA-Bench's installation requirements](https://github.com/yang-zj1026/NaVILA-Bench#installation): **Python 3.10, Isaac Sim 4.1.0, and the NaVILA Isaac Lab 1.1.0 fork**. Use Ubuntu 22.04 or later for this pip-based setup, with a compatible NVIDIA GPU and driver.
 
 ```bash
 conda create -n adahvla-isaac python=3.10 -y
@@ -127,15 +89,13 @@ git clone https://github.com/yang-zj1026/IsaacLab.git /path/to/IsaacLab
 ISAACLAB_ROOT=/path/to/IsaacLab bash scripts/setup_locomotion.sh
 ```
 
-The helper validates the Lab checkout, installs Lab core and [`requirements-locomotion.txt`](requirements-locomotion.txt), and runs `pip check`. It selects PyTorch 2.2.2 with CUDA 12.1 wheels by default; set `ADAHVLA_CUDA=cu118` to use CUDA 11.8 wheels. Additional VLNCE/Matterport extensions and RSL-RL are not needed for this inference path.
-
-The controller consumes 909 values: 45 proprioceptive features, a 459-value height map, and nine frames of proprioceptive history. It outputs 12 joint actions at 50 Hz. Timing and resource paths are defined in [`configs/locomotion.json`](configs/locomotion.json); relative paths resolve from the project root.
+The helper installs Lab core and [`requirements-locomotion.txt`](requirements-locomotion.txt), then runs `pip check`. It defaults to PyTorch 2.2.2 with CUDA 12.1 wheels; set `ADAHVLA_CUDA=cu118` for CUDA 11.8. Simulation timing and asset paths are in [`configs/locomotion.json`](configs/locomotion.json); relative paths resolve from the project root.
 
 ### 3. Start the NaVILA server
 
-Install the model dependencies in a **separate environment** using the [NaVILA repository](https://github.com/AnjieCheng/NaVILA) and [Isaac evaluation setup](https://github.com/yang-zj1026/NaVILA-Bench#vla-evaluation). Download the [NaVILA Llama-3 8B, 8-frame checkpoint](https://huggingface.co/a8cheng/navila-llama3-8b-8f). VLA weights are not bundled here.
+Install NaVILA in a **separate environment** following the [NaVILA repository](https://github.com/AnjieCheng/NaVILA) and [Isaac evaluation setup](https://github.com/yang-zj1026/NaVILA-Bench#vla-evaluation). Download the [NaVILA Llama-3 8B, 8-frame checkpoint](https://huggingface.co/a8cheng/navila-llama3-8b-8f); model weights are not bundled.
 
-In **terminal A**, activate that environment and launch this project's server adapter:
+In **terminal A**:
 
 ```bash
 conda activate navila
@@ -145,11 +105,11 @@ PYTHONPATH=/path/to/AdaHVLA/src${PYTHONPATH:+:$PYTHONPATH} \
   --host 127.0.0.1 --port 54321 --device cuda
 ```
 
-Wait for `NaVILA listening` and leave the server running. The server uses an unauthenticated socket protocol; keep it on loopback or access it through a trusted private connection, such as an SSH tunnel.
+Wait for `NaVILA listening` and keep the server running. Its socket protocol has no authentication; use loopback or a trusted private connection such as an SSH tunnel.
 
 ### 4. Configure the reasoning API
 
-In **terminal B**, activate the simulation environment:
+In **terminal B**:
 
 ```bash
 conda activate adahvla-isaac
@@ -161,38 +121,33 @@ read -rs -p "API key: " ADAHVLA_API_KEY; echo
 export ADAHVLA_API_KEY
 ```
 
-The endpoint must support the Chat Completions format, image inputs, JSON object responses, and `temperature=0`. The online harness and four adaptation roles use the same model configuration with separate contexts.
+The endpoint must support Chat Completions, image inputs, JSON object responses, and `temperature=0`. The online harness and adaptation agents share this configuration with separate contexts. The key is passed through the environment; do not commit credentials.
 
-[`scripts/run.sh`](scripts/run.sh) also contains `YOUR_API_KEY`, `YOUR_API_ENDPOINT`, and `YOUR_VISION_MODEL` placeholders that you can fill locally. Environment variables take precedence. Prefer the terminal setup above when sharing code, and never commit a script containing a real key. The API key is passed through the environment rather than command-line arguments.
-
-| Variable | Purpose | Default |
-| --- | --- | --- |
-| `ADAHVLA_API_KEY` | Reasoning API credential | User supplied |
-| `ADAHVLA_BASE_URL` | API base URL, usually ending in `/v1` | User supplied |
-| `ADAHVLA_MODEL` | Vision-capable model with JSON output | User supplied |
-| `ADAHVLA_VLA_HOST` | NaVILA server address | `127.0.0.1` |
-| `ADAHVLA_VLA_PORT` | NaVILA server port | `54321` |
-| `ADAHVLA_PYTHON` | Python executable for the run script | `python` |
+| Variable | Purpose / default |
+| --- | --- |
+| `ADAHVLA_API_KEY` | Your API credential |
+| `ADAHVLA_BASE_URL` | API base URL, usually ending in `/v1` |
+| `ADAHVLA_MODEL` | Vision-capable model with JSON output |
+| `ADAHVLA_VLA_HOST` / `ADAHVLA_VLA_PORT` | NaVILA address: `127.0.0.1` / `54321` |
+| `ADAHVLA_PYTHON` | Runner Python executable: `python` |
 
 ## Running adaptation
 
-Start with one prototype rollout to verify the complete model–simulator connection:
+Verify the API–NaVILA–simulator connection with one prototype rollout:
 
 ```bash
 bash scripts/run.sh --prototype-only
 ```
 
-Then continue the same session through adaptation and held-out evaluation:
+Then continue through adaptation and held-out evaluation:
 
 ```bash
 bash scripts/run.sh
 ```
 
-You can also run the second command directly: it evaluates the prototype first.
+The second command also works directly and evaluates the prototype first. Defaults use **episode 27 for adaptation, 124 for validation, and 167 for held-out testing**. These are small example selections, not the paper's full evaluation or an upstream benchmark protocol. IDs refer to **`episode_id`**, not row numbers or `episode_new_id`.
 
-The defaults use **episode 27 for adaptation, 124 for validation, and 167 for held-out testing**. These three episodes provide a small starting configuration. They do not reproduce the paper's full evaluation. All selection arguments refer to **`episode_id`**, not dataset row numbers or `episode_new_id`.
-
-To choose disjoint episode sets and an explicit run directory:
+Choose disjoint episode sets and a new output directory for a separate experiment:
 
 ```bash
 bash scripts/run.sh \
@@ -203,68 +158,68 @@ bash scripts/run.sh \
   --output-dir ../AdaHVLA-runs/experiment-01
 ```
 
-| Option | Meaning | Default |
+| Option | Limit | Default |
 | --- | --- | --- |
 | `--max-steps` | Manager scheduling steps | `16` |
 | `--max-candidates` | Revision attempts | `4` |
 | `--max-rollouts` | Adaptation rollout attempts | `12` |
-| `--width` / `--depth` | Local revision search limits | `2` / `2` |
+| `--width` / `--depth` | Local revision search | `2` / `2` |
 | `--max-decisions` | Harness decisions per episode | `128` |
-| `--max-episode-seconds` | Simulated time per episode | `180` |
-| `--rollout-timeout` | Wall-clock timeout per simulator process | `7200` |
+| `--max-episode-seconds` | Simulated seconds per episode | `180` |
+| `--rollout-timeout` | Wall-clock seconds per simulator process | `7200` |
 
-Each held-out episode runs separately after harness selection, outside the adaptation rollout budget. Pass `--test-ids ""` to omit held-out testing. Run `bash scripts/run.sh --help` for all options.
+Held-out episodes run after selection, outside the adaptation rollout budget. Use `--test-ids ""` to skip them. See `bash scripts/run.sh --help` for all options.
 
 ### Outputs and resuming
 
-Runs are written outside the source directory, by default to `../AdaHVLA-runs/navila-LH/`:
+Output directories must be outside the source tree. The default is `../AdaHVLA-runs/navila-LH/`:
 
 ```text
-adaptation.json                   # experiment configuration and adaptation state
+adaptation.json                   # configuration and adaptation state
 selected.json                     # selected candidate and source hash
 candidates/C0000/adahvla/          # prototype source snapshot
 candidates/C0001/adahvla/          # revised candidate source
 checks/                           # source and interface check results
 rollouts/R0001/evidence.json       # adaptation rollout evidence
-rollouts/R0001/images/             # timestamped, view-labeled observations
-rollouts/R0001/output/process.log  # simulator subprocess output
+rollouts/R0001/images/             # timestamped observations
+rollouts/R0001/output/process.log  # simulator output
 rollouts/T0001/                    # held-out evaluation evidence
 ```
 
-Rerun with the **same arguments and output directory** to resume. Completed prototype rollouts are reused. Interrupted or failed evaluations can consume an attempt; inspect their evidence before interpreting the results. Use one runner per output directory, and start a new directory when changing episode sets, model configuration, budgets, or fixed evaluation code.
+Resume with the **same arguments and output directory**; completed prototype rollouts are reused. Failed or interrupted evaluations may consume an attempt. Use one runner per directory, and start a new directory when changing episode sets, model configuration, budgets, or fixed evaluation code. Held-out execution still calls the reasoning API, but makes no further code revisions.
 
-The held-out phase evaluates the selected harness without further code revisions. The online harness still calls the reasoning API while executing held-out tasks. Runtime evidence is generated locally and is not part of the source release.
+## Customizing the harness
 
-## Evaluation and validation
+**The provided harness is a sample implementation. Write and optimize it for your robot, observations, task structure, and completion criteria.** In [`harness.py`](src/adahvla/harness.py), start with `DECISION_PROMPT`, `ContextPolicy`, `ProgressPolicy`, and `HandoffPolicy`. Validate changes on representative rollouts before adaptation and reserve separate episodes for testing.
 
-The current evaluator reports success when the harness declares completion and the robot's final **3D Euclidean distance** to the target is within the goal radius. It also records termination reasons, actions, trajectory length, and sampled visual evidence. Ground-truth goal coordinates, reference trajectories, and annotated actions are kept out of the online harness input.
+| File | What to change |
+| --- | --- |
+| [`harness.py`](src/adahvla/harness.py) | Prompts, memory, progress, recovery, and execution guidance |
+| [`adaptation.py`](src/adahvla/adaptation.py) | Agent roles, revision workflow, selection, and budgets |
+| [`workspace.py`](src/adahvla/workspace.py) | Candidate checks, evaluation subprocesses, and evidence storage |
+| [`vla.py`](src/adahvla/vla.py) | VLA client/server adapter |
+| [`locomotion.py`](src/adahvla/locomotion.py), [`configs/`](configs/) | Robot controller and simulator integration |
+| [`evaluate.py`](scripts/evaluate.py) | Episode execution and task metrics |
 
-This endpoint metric does not verify every intermediate subgoal and is not a geodesic or SPL metric. Sampled images are not a full video. The release does not include the paper's complete experiment configurations or result archive.
+Other robots require matching executor and environment interfaces. Candidate checks and source hashes provide integrity checks, not an OS security sandbox.
 
-Run the offline tests with:
+## Evaluation and tests
+
+Success requires harness-declared completion and a final **3D Euclidean goal distance strictly below the goal radius**. This endpoint metric does not verify every intermediate subgoal and is not official navigation SR, geodesic distance, or SPL. Ground-truth goals and reference trajectories are excluded from online harness inputs. The release does not include the paper's full experiment configurations or result archive.
+
+Run the offline software tests:
 
 ```bash
 PYTHONDONTWRITEBYTECODE=1 PYTHONPATH=src \
   python -m unittest discover -s tests -v
 ```
 
-Tests cover harness state transitions, adaptation, candidate loading, runner behavior, action parsing, and CPU controller inference. Controller tests require PyTorch; fake environments and reasoners exercise software contracts. These checks do not establish navigation performance. A fresh simulator installation, the full reasoning API–NaVILA loop, and benchmark-scale adaptation should be validated in the target deployment environment.
+Controller tests require PyTorch. Tests check software behavior; validate the complete simulator/API setup and navigation performance in your deployment environment.
 
 ## Acknowledgments
 
-This implementation builds on **[NaVILA: Legged Robot Vision-Language-Action Model for Navigation](https://arxiv.org/abs/2412.04453), RSS 2025**. We thank the NaVILA authors for their models, benchmark, environment configuration, and locomotion resources.
-
-| Resource | Upstream project |
-| --- | --- |
-| VLA model and implementation | [AnjieCheng/NaVILA](https://github.com/AnjieCheng/NaVILA) |
-| Navigation benchmark and environment setup | [yang-zj1026/NaVILA-Bench](https://github.com/yang-zj1026/NaVILA-Bench) |
-| Simulation scene release | [VLN-CE-Isaac](https://huggingface.co/datasets/Zhaojing/VLN-CE-Isaac), based on [Matterport3D](https://niessner.github.io/Matterport/) |
-| Locomotion training | [yang-zj1026/legged-loco](https://github.com/yang-zj1026/legged-loco) |
-| Simulator integration | [NaVILA's Isaac Lab fork](https://github.com/yang-zj1026/IsaacLab) |
-| Go2 robot assets | NVIDIA Isaac Sim 4.1; sources in [`assets/manifest.json`](assets/manifest.json) |
+We build on **[NaVILA: Legged Robot Vision-Language-Action Model for Navigation](https://arxiv.org/abs/2412.04453), RSS 2025**, and thank its authors for the models and resources. We also use [NaVILA-Bench](https://github.com/yang-zj1026/NaVILA-Bench), [VLN-CE-Isaac](https://huggingface.co/datasets/Zhaojing/VLN-CE-Isaac), [Matterport3D](https://niessner.github.io/Matterport/), [legged-loco](https://github.com/yang-zj1026/legged-loco), and [NaVILA's Isaac Lab fork](https://github.com/yang-zj1026/IsaacLab). Asset provenance is recorded in [`assets/manifest.json`](assets/manifest.json).
 
 ## License
 
-AdaHVLA's original code is licensed under the [Apache License 2.0](LICENSE).
-
-Third-party code retains its original license and attribution notices, collected in [`THIRD_PARTY_NOTICES.txt`](THIRD_PARTY_NOTICES.txt). Datasets, scene and robot assets, and model weights remain subject to their respective upstream terms; the Apache-2.0 license does not replace those terms.
+AdaHVLA's original code is licensed under [Apache-2.0](LICENSE). Third-party code, assets, datasets, and model weights retain their upstream terms; see [`THIRD_PARTY_NOTICES.txt`](THIRD_PARTY_NOTICES.txt).
