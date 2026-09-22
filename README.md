@@ -16,29 +16,6 @@ AdaHVLA connects task-level reasoning and memory with vision-language-action (VL
 
 This release includes **Go2 simulation navigation**: the sample harness, adaptation loop, NaVILA adapter, locomotion controller, simulator assets, and the 50-episode `navila-LH` dataset. Manipulation and real-robot adapters are not included. For manipulation research, we recommend [π0.5](https://www.pi.website/blog/pi05) and [openpi](https://github.com/Physical-Intelligence/openpi).
 
-## Demos
-
-Cropped excerpts from the submission video, with subtitles and episode labels removed. Click a preview to open its MP4 version.
-
-### Real-world execution
-
-[![AdaHVLA quadruped completing a multi-stage task in the real world.](docs/assets/demo-real-world.gif)](docs/assets/demo-real-world.mp4)
-
-*Multi-stage quadruped navigation; 2× the submission video's playback speed.*
-
-### Simulation
-
-**Navigation — three tasks.** Single VLA on the top row; AdaHVLA on the bottom row. Cropped first-person views, at 1.5× playback speed.
-
-[![Three simulated navigation comparisons, with Single VLA above AdaHVLA.](docs/assets/demo-simulation-navigation.gif)](docs/assets/demo-simulation-navigation.mp4)
-
-**Manipulation — grasp, transfer, and release.** Single VLA on the top row; AdaHVLA on the bottom row, at 1.5× playback speed.
-
-[![Simulated manipulation comparison at grasp, transfer, and release stages.](docs/assets/demo-simulation-manipulation.gif)](docs/assets/demo-simulation-manipulation.mp4)
-
-<details>
-<summary>Paper figures: deployments and architecture</summary>
-
 <p align="center">
   <img src="docs/assets/figure1.png" width="480" alt="Paper Figure 1: AdaHVLA in simulated navigation and manipulation environments and on a real quadruped." />
 </p>
@@ -48,7 +25,21 @@ Cropped excerpts from the submission video, with subtitles and episode labels re
 
 *Figure 2. Harness execution and adaptation from rollout evidence.*
 
-</details>
+## Demos
+
+Excerpts from the submission video at its original playback speed. Click a preview for the full-resolution MP4.
+
+### Real-world execution
+
+[![Real-world quadruped execution, with the robot view, task progress, and comparison panels.](docs/assets/demo-real-world.gif)](docs/assets/demo-real-world.mp4)
+
+*Multi-stage quadruped navigation, including the robot view and comparisons with Single VLA and harness revisions.*
+
+### Simulation
+
+Three navigation tasks with Single VLA above AdaHVLA; manipulation comparisons at grasp, transfer, and release along the bottom.
+
+[![Simulation comparisons with all navigation camera views and the manipulation panels in their original layout.](docs/assets/demo-simulation.gif)](docs/assets/demo-simulation.mp4)
 
 ## Getting started
 
