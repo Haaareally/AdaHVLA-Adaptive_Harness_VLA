@@ -1,0 +1,18 @@
+# Go2 simulation baseline; use scripts/setup_locomotion.sh to include Isaac Lab.
+# Version constraints come from Isaac Lab 1.1.0, not an environment lockfile.
+--extra-index-url https://pypi.nvidia.com
+-r requirements.txt
+
+numpy==1.26.4
+torch==2.2.2
+torchvision==0.17.2
+gymnasium==0.29.0
+tensordict==0.3.2
+Pillow>=10
+
+isaacsim-rl==4.1.0
+isaacsim-replicator==4.1.0
+isaacsim-extscache-physics==4.1.0
+isaacsim-extscache-kit-sdk==4.1.0
+isaacsim-extscache-kit==4.1.0
+isaacsim-app==4.1.0

@@ -1,0 +1,12 @@
+{
+  "paths": {
+    "dataset": "benchmarks/navila-LH/dataset.json.gz",
+    "policy": "assets/locomotion/go2/policy.jit",
+    "robot_usd": "assets/robots/go2/go2.usd",
+    "scenes": "assets/matterport"
+  },
+  "history_length": 9,
+  "physics_dt": 0.005,
+  "decimation": 4,
+  "action_scale": 0.25
+}

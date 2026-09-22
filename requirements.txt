@@ -1,0 +1,3 @@
+# Core harness and adaptation use the Python standard library.
+# Run from the AdaHVLA project root.
+-e .
