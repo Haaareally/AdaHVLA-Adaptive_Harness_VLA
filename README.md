@@ -8,22 +8,68 @@ The preprint of our paper is coming soon.
 
 [Overview](#overview) · [Demos](#demos) · [Getting started](#getting-started) · [Running adaptation](#running-adaptation) · [Customizing the harness](#customizing-the-harness) · [Acknowledgments](#acknowledgments)
 
-</div>
-
-AdaHVLA connects task-level reasoning and memory with vision-language-action (VLA) execution through an adaptive harness. The harness controls local instructions, visual context, task progress, recovery, and completion. Between rollouts, manager, analyst, engineer, and reviewer agents turn execution evidence into hypotheses and code revisions. A revision graph retains candidate harnesses and their observed effects to guide further adaptation.
-
-## Overview
-
-This release includes **Go2 simulation navigation**: the sample harness, adaptation loop, NaVILA adapter, locomotion controller, simulator assets, and the 50-episode `navila-LH` dataset. Manipulation and real-robot adapters are not included. For manipulation research, we recommend [π0.5](https://www.pi.website/blog/pi05) and [openpi](https://github.com/Physical-Intelligence/openpi).
+<table>
+  <tr>
+    <td width="58%" valign="top">
+      <p>
+        AdaHVLA connects task-level reasoning and memory with
+        vision-language-action (VLA) execution through an adaptive
+        harness. The harness maintains task state, constructs local
+        instructions and visual context, and coordinates task progress,
+        recovery, and completion across successive VLA calls.
+      </p>
+      <p>
+        Between rollouts, a multiagent adaptation process turns execution
+        evidence into coordination hypotheses and code revisions, then
+        assesses their effects in subsequent rollouts. A revision graph
+        retains candidate harnesses and their observed effects to guide
+        further adaptation. This allows the executable rules governing
+        task coordination to evolve through interaction with the
+        environment.
+      </p>
+      <h2>Overview</h2>
+      <p>
+        This release provides a <strong>Go2 simulation navigation</strong>
+        implementation, including a sample harness, the multiagent
+        adaptation loop, a NaVILA adapter, a locomotion controller,
+        simulator assets, and the 50-episode <code>navila-LH</code> dataset.
+      </p>
+      <p>
+        The code supports prototype execution, iterative harness
+        revision, and held-out evaluation, with candidate source
+        snapshots and rollout evidence retained for inspection.
+        Manipulation and real-robot adapters are coming in the future.
+      </p>
+    </td>
+    <td width="42%" valign="top" align="center">
+      <img
+        src="docs/assets/figure1.png"
+        width="100%"
+        alt="Paper Figure 1: AdaHVLA in simulated navigation and manipulation environments and on a real quadruped."
+      />
+      <p>
+        <em>
+          Figure 1. Tasks, environments, and robotic platforms
+          studied in the paper.
+        </em>
+      </p>
+    </td>
+  </tr>
+</table>
 
 <p align="center">
-  <img src="docs/assets/figure1.png" width="480" alt="Paper Figure 1: AdaHVLA in simulated navigation and manipulation environments and on a real quadruped." />
+  <img
+    src="docs/assets/figure2.png"
+    width="100%"
+    alt="Paper Figure 2: execution harness, adaptation loop, and candidate revision graph."
+  />
 </p>
-<p align="center"><em>Figure 1. Tasks, environments, and robotic platforms studied in the paper.</em></p>
 
-![Paper Figure 2: execution harness, adaptation loop, and candidate revision graph.](docs/assets/figure2.png)
-
-*Figure 2. Harness execution and adaptation from rollout evidence.*
+<p align="center">
+  <em>
+    Figure 2. Harness execution and adaptation from rollout evidence.
+  </em>
+</p>
 
 ## Demos
 
