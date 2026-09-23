@@ -17,21 +17,19 @@ AdaHVLA connects task-level reasoning and memory with vision-language-action (VL
 <img
   align="right"
   src="docs/assets/figure1.png"
-  height="300"
-  hspace="16"
+  height="340"
+  hspace="12"
   alt="Figure 1. AdaHVLA framework and representative real-world and simulation tasks."
   title="Figure 1. AdaHVLA framework and representative robot tasks."
 />
 
-At a high level, AdaHVLA combines a task execution harness with a rollout-driven adaptation loop. The harness carries a long-horizon task across successive VLA calls; the loop uses observed outcomes to propose and assess changes to that harness.
+AdaHVLA pairs a task execution harness with a rollout-driven adaptation loop. The harness carries task state across successive VLA calls, while the loop uses rollout evidence to revise its coordination logic. Figure 1 shows the framework and representative robot tasks; Figure 2 summarizes the execution and adaptation workflow.
 
-Figure 1 places our framework alongside representative real-world and simulation tasks. Figure 2 summarizes the execution and adaptation workflow.
-
-This repository provides a **sample harness for Go2 simulation navigation**. The included setup connects a NaVILA adapter, a locomotion controller, task-specific coordination logic, rollout records, and evaluation of candidate revisions. For a specific robot or task, replace the observation and action interfaces, task instructions, progress and completion rules, or environment integration as needed, then optimize the harness with your own rollouts.
+This repository provides a **sample harness for Go2 simulation navigation**. The included setup connects a NaVILA adapter, locomotion controller, task-specific coordination logic, rollout records, and candidate evaluation. It provides a concrete path for running a task, inspecting the outcome, and trying a revised harness. For a specific robot or task, replace the observation and action interfaces, instructions, progress and completion rules, or environment integration as needed, then optimize the harness with rollouts from your setting.
 
 <br clear="both">
 
-<p align="right"><em>Figure 1. AdaHVLA overview.</em></p>
+<div align="right"><em>Figure 1. AdaHVLA overview.</em></div>
 
 <br>
 
