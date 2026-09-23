@@ -23,13 +23,17 @@ AdaHVLA connects task-level reasoning and memory with vision-language-action (VL
   title="Figure 1. AdaHVLA framework and representative robot tasks."
 />
 
-AdaHVLA pairs a task execution harness with a rollout-driven adaptation loop. The harness guides VLA calls through a task, while the loop updates its coordination rules from rollout evidence.
+At a high level, AdaHVLA combines a task execution harness with a rollout-driven adaptation loop. The harness carries a long-horizon task across successive VLA calls; the loop uses observed outcomes to propose and assess changes to that harness.
 
-Our framework and representative robot tasks are shown in Figure 1; the execution and adaptation workflow is outlined in Figure 2.
+Figure 1 places our framework alongside representative real-world and simulation tasks. Figure 2 summarizes the execution and adaptation workflow.
 
-This repository provides a **sample harness for Go2 simulation navigation**. For a specific robot or task, replace the task-specific interfaces and logic as needed, then further optimize the harness on this foundation.
+This repository provides a **sample harness for Go2 simulation navigation**. The included setup connects a NaVILA adapter, a locomotion controller, task-specific coordination logic, rollout records, and evaluation of candidate revisions. For a specific robot or task, replace the observation and action interfaces, task instructions, progress and completion rules, or environment integration as needed, then optimize the harness with your own rollouts.
 
 <br clear="both">
+
+<p align="right"><em>Figure 1. AdaHVLA overview.</em></p>
+
+<br>
 
 <p align="center">
   <img
