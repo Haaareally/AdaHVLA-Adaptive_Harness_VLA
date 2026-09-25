@@ -4,7 +4,7 @@
 
 ### Adaptive Harnesses for Long-Horizon Vision-Language-Action Execution
 
-[Paper (arXiv PDF)](https://arxiv.org/pdf/2609.29204)
+[![arXiv: 2609.29204](https://img.shields.io/badge/arXiv-2609.29204-b31b1b.svg)](https://arxiv.org/pdf/2609.29204)
 
 [Overview](#overview) · [Demos](#demos) · [Getting started](#getting-started) · [Running adaptation](#running-adaptation) · [Customizing the harness](#customizing-the-harness) · [Acknowledgments](#acknowledgments)
 
