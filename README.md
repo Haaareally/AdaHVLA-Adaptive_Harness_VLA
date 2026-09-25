@@ -4,7 +4,7 @@
 
 ### Adaptive Harnesses for Long-Horizon Vision-Language-Action Execution
 
-The preprint of our paper is coming soon.
+[Paper (arXiv PDF)](https://arxiv.org/pdf/2609.29204)
 
 [Overview](#overview) · [Demos](#demos) · [Getting started](#getting-started) · [Running adaptation](#running-adaptation) · [Customizing the harness](#customizing-the-harness) · [Acknowledgments](#acknowledgments)
 
@@ -134,7 +134,7 @@ read -rs -p "API key: " ADAHVLA_API_KEY; echo
 export ADAHVLA_API_KEY
 ```
 
-The endpoint must support Chat Completions, image inputs, JSON object responses, and `temperature=0`. The online harness and adaptation agents share this configuration with separate contexts. The key is passed through the environment; do not commit credentials.
+The endpoint must support Chat Completions, image inputs, JSON object responses. 
 
 | Variable | Purpose / default |
 | --- | --- |
@@ -158,7 +158,7 @@ Then continue through adaptation and held-out evaluation:
 bash scripts/run.sh
 ```
 
-The second command also works directly and evaluates the prototype first. Defaults use **episode 27 for adaptation, 124 for validation, and 167 for held-out testing**. These are small example selections, not the paper's full evaluation or an upstream benchmark protocol. IDs refer to **`episode_id`**, not row numbers or `episode_new_id`.
+The second command also works directly and evaluates the prototype first. 
 
 Choose disjoint episode sets and a new output directory for a separate experiment:
 
@@ -199,7 +199,7 @@ rollouts/R0001/output/process.log  # simulator output
 rollouts/T0001/                    # held-out evaluation evidence
 ```
 
-Resume with the **same arguments and output directory**; completed prototype rollouts are reused. Failed or interrupted evaluations may consume an attempt. Use one runner per directory, and start a new directory when changing episode sets, model configuration, budgets, or fixed evaluation code. Held-out execution still calls the reasoning API, but makes no further code revisions.
+Resume with the **same arguments and output directory**; completed prototype rollouts are reused. Failed or interrupted evaluations may consume an attempt. Use one runner per directory, and start a new directory when changing episode sets, model configuration, budgets, or fixed evaluation code. 
 
 ## Customizing the harness
 
@@ -218,8 +218,7 @@ Other robots require matching executor and environment interfaces. Candidate che
 
 ## Evaluation and tests
 
-Success requires harness-declared completion and a final **3D Euclidean goal distance strictly below the goal radius**. This endpoint metric does not verify every intermediate subgoal and is not official navigation SR, geodesic distance, or SPL. Ground-truth goals and reference trajectories are excluded from online harness inputs. The release does not include the paper's full experiment configurations or result archive.
-
+Success requires harness-declared completion and a final **3D Euclidean goal distance strictly below the goal radius**. 
 Run the offline software tests:
 
 ```bash
@@ -233,6 +232,16 @@ Controller tests require PyTorch. Tests check software behavior; validate the co
 
 We build on **[NaVILA: Legged Robot Vision-Language-Action Model for Navigation](https://arxiv.org/abs/2412.04453), RSS 2025**, and thank its authors for the models and resources. We also use [NaVILA-Bench](https://github.com/yang-zj1026/NaVILA-Bench), [VLN-CE-Isaac](https://huggingface.co/datasets/Zhaojing/VLN-CE-Isaac), [Matterport3D](https://niessner.github.io/Matterport/), [legged-loco](https://github.com/yang-zj1026/legged-loco), and [NaVILA's Isaac Lab fork](https://github.com/yang-zj1026/IsaacLab). Asset provenance is recorded in [`assets/manifest.json`](assets/manifest.json).
 
-## License
+## Citation
 
-AdaHVLA's original code is licensed under [Apache-2.0](LICENSE). Third-party code, assets, datasets, and model weights retain their upstream terms; see [`THIRD_PARTY_NOTICES.txt`](THIRD_PARTY_NOTICES.txt).
+```bibtex
+@misc{tang2026adahvlaadaptiveharnesseslonghorizon,
+  title={AdaHVLA: Adaptive Harnesses for Long-Horizon Vision-Language-Action Execution},
+  author={Junyi Tang and Jie Peng and Zezhen Ding and Yuan Shen and Tianlong Chen},
+  year={2026},
+  eprint={2609.29204},
+  archivePrefix={arXiv},
+  primaryClass={cs.RO},
+  url={https://arxiv.org/abs/2609.29204}
+}
+```
