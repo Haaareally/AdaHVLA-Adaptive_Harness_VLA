@@ -104,6 +104,18 @@ class HarnessTests(unittest.TestCase):
                 self.assertIs(harness.state, state)
                 self.assertEqual(harness.context, context)
 
+    def test_whitespace_padded_enum_fields_are_stripped_before_validation(self):
+        harness, _ = self.harness(
+            decision(plan=PLAN), decision(progress=" hold\n", mode=" execute "),
+            decision(progress=" advance ", query="Place the object in the container"),
+        )
+        harness.step(observation(0))
+        first = harness.step(observation(1))
+        self.assertEqual(first.goal_index, 0)
+        self.assertEqual(first.mode, "execute")
+        second = harness.step(observation(2))
+        self.assertEqual(second.goal_index, 1)
+
     def test_final_goal_needs_explicit_completion(self):
         harness, _ = self.harness(
             decision(plan=PLAN[:1]), decision(progress="advance"),

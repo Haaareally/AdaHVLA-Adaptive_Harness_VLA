@@ -66,9 +66,11 @@ class Decision:
             raise ValueError("Decision fields do not match the response contract")
         if any(not isinstance(value[key], str) for key in required):
             raise ValueError("Decision text fields must be strings")
-        if value["progress"] not in {"hold", "advance", "rollback", "complete"}:
+        progress = value["progress"].strip()
+        mode = value["mode"].strip()
+        if progress not in {"hold", "advance", "rollback", "complete"}:
             raise ValueError("Unknown progress transition")
-        if value["mode"] not in {"execute", "recover"}:
+        if mode not in {"execute", "recover"}:
             raise ValueError("Unknown execution mode")
         target = value.get("rollback_to")
         if target is not None and type(target) is not int:
